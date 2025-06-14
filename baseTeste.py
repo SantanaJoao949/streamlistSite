@@ -24,6 +24,7 @@ if dataframe is not None:
     Produto = dataframe['Produto'].unique()
     Veiculos = dataframe['Veiculo'].unique()
     
+
     with filtro1:
         produto_selecionado = st.selectbox('Filtrar por categoria de produto', Produto)
 
@@ -31,43 +32,33 @@ if dataframe is not None:
         veiculo_selecionado = st.selectbox('Filtrar por veículo', Veiculos)
 
 
-    # filtro por todos
-    Produto = ['Todos'] + list(Produto)
-    Veiculos = ['Todos'] + list(Veiculos)
+    # Filtrando os dados com base nas escolhas do usuário
+    df_filtrado = dataframe[(dataframe['Produto'] == produto_selecionado) & (dataframe['Veiculo'] == veiculo_selecionado)]
 
-    if produto_selecionado != 'Todos':
-        df_filtrado = dataframe[dataframe['Produto'] == produto_selecionado]
-    else:
-        if veiculo_selecionado != 'Todos':
-            df_filtrado = dataframe[dataframe['Veiculo'] == veiculo_selecionado]
-        else:
-            df_filtrado = dataframe 
-        df_filtrado = dataframe[(dataframe['Produto'] == produto_selecionado) & (dataframe['Veiculo'] == veiculo_selecionado)]
+    # Métricas principais
+    total_entregas = len(df_filtrado)
+    soma_fretes = df_filtrado['Valor_Frete'].sum()
 
-        # Métricas principais
-        total_entregas = len(df_filtrado)
-        soma_fretes = df_filtrado['Valor_Frete'].sum()
+    # Exibindo as métricas principais
+    st.subheader("Métricas Principais")
+    st.metric("Total de entregas", total_entregas)
+    st.metric(f"Soma do valor dos fretes R$", f"{soma_fretes:,.2f}")
 
-        # Exibindo as métricas principais
-        st.subheader("Métricas Principais")
-        st.metric("Total de entregas", total_entregas)
-        st.metric(f"Soma do valor dos fretes R$", f"{soma_fretes:,.2f}")
+    # Gráfico de Barras: Quantidade de entregas por estado
+    entregas_estado = df_filtrado['Estado_Entrega'].value_counts().reset_index()
+    entregas_estado.columns = ['Estado_Entrega', 'Quantidade de Entregas']
+    fig = px.bar(
+    entregas_estado,
+    x='Estado_Entrega',
+    y='Quantidade de Entregas',
+    title="Quantidade de Entregas por Estado",
+    color_discrete_sequence=["#F81904"]
+)
+    st.plotly_chart(fig)
 
-        # Gráfico de Barras: Quantidade de entregas por estado
-        entregas_estado = df_filtrado['Estado_Entrega'].value_counts().reset_index()
-        entregas_estado.columns = ['Estado_Entrega', 'Quantidade de Entregas']
-        fig = px.bar(
-        entregas_estado,
-        x='Estado_Entrega',
-        y='Quantidade de Entregas',
-        title="Quantidade de Entregas por Estado",
-        color_discrete_sequence=["#F81904"])
-        
-        st.plotly_chart(fig)
-
-        # Tabela de dados filtrados
-        st.subheader("Tabela de Dados Filtrados")
-        st.dataframe(df_filtrado)
+    # Tabela de dados filtrados
+    st.subheader("Tabela de Dados Filtrados")
+    st.dataframe(df_filtrado)
 
 else:
     st.write("Por favor, carregue a planilha para continuar.")
