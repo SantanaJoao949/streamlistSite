@@ -23,16 +23,17 @@ if dataframe is not None:
     filtro1, filtro2 = st.columns(2)
     Produto = dataframe['Produto'].unique()
     Veiculos = dataframe['Veiculo'].unique()
-     # filtro por todos
-    Produto = ['Todos'] + list(Produto)
-    Veiculos = ['Todos'] + list(Veiculos)
-
+    
     with filtro1:
         produto_selecionado = st.selectbox('Filtrar por categoria de produto', Produto)
 
     with filtro2:
         veiculo_selecionado = st.selectbox('Filtrar por veículo', Veiculos)
 
+
+    # filtro por todos
+    Produto = ['Todos'] + list(Produto)
+    Veiculos = ['Todos'] + list(Veiculos)
 
     if produto_selecionado != 'Todos':
         df_filtrado = dataframe[dataframe['Produto'] == produto_selecionado]
